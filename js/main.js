@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/OrbitControls.js';
+import { createGlobe } from './globe.js';
 
 const container = document.getElementById('scene');
 let renderer;
@@ -22,11 +23,7 @@ controls.enableDamping = true;
 controls.minDistance = 1.6;
 controls.maxDistance = 8;
 
-const globe = new THREE.Mesh(
-  new THREE.SphereGeometry(1, 64, 48),
-  new THREE.MeshPhongMaterial({ color: 0xa8d4e8 })
-);
-scene.add(globe);
+const globe = await createGlobe(scene);
 scene.add(new THREE.AmbientLight(0xffffff, 1.6));
 const dir = new THREE.DirectionalLight(0xffffff, 1.2);
 dir.position.set(2, 1.5, 3);
@@ -39,6 +36,9 @@ addEventListener('resize', () => {
 });
 
 renderer.setAnimationLoop(() => { controls.update(); renderer.render(scene, camera); });
+
+// временный отладочный хук (убрать в задаче 8)
+window.__debug = { renderer, scene, camera, globe };
 
 // временная проверка tween + labels (задача 3)
 import { makeLabelSprite } from './labels.js';
