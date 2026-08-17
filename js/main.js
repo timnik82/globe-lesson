@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/OrbitControls.js';
 import { createGlobe } from './globe.js';
+import { createGraticule } from './graticule.js';
 
 const container = document.getElementById('scene');
 let renderer;
@@ -24,6 +25,8 @@ controls.minDistance = 1.6;
 controls.maxDistance = 8;
 
 const globe = await createGlobe(scene);
+const grat = createGraticule(scene);
+grat.setLayers({ parallels: true, meridians: true, equator: true, greenwich: true }); // временно, для проверки
 scene.add(new THREE.AmbientLight(0xffffff, 1.6));
 const dir = new THREE.DirectionalLight(0xffffff, 1.2);
 dir.position.set(2, 1.5, 3);
