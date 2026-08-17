@@ -20,4 +20,5 @@ button:disabled { opacity: .45; cursor: default; }
 #help-modal[hidden] { display: none; }
 #help-modal > div { background: #13234a; padding: 20px 26px; border-radius: 12px; max-width: 420px; }
 #fallback { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; text-align: center; }
+#fallback[hidden] { display: none; }
 @media (max-width: 760px) { #free-panel { width: 240px; } body { font-size: 16px; } }
