@@ -9,6 +9,7 @@ import { CITIES } from './cities.js';
 import { makeDynamicLabel } from './labels.js';
 import { tween, cancelAllTweens, tweenCamera } from './tween.js';
 import { createFreeplay } from './freeplay.js';
+import { createLesson } from './lesson.js';
 
 const container = document.getElementById('scene');
 let renderer;
@@ -143,8 +144,7 @@ function sleepTracked(ms) {
 }
 function clearTracked() { for (const id of timers) clearTimeout(id); timers.clear(); }
 
-let lesson = null; // создаётся в задаче 9
-let game = null;   // создаётся в задаче 10
+let game = null; // создаётся в задаче 10
 
 const app = {
   THREE, scene, camera, renderer, controls, globe, grat, arcs, marker,
@@ -166,6 +166,8 @@ const app = {
 };
 
 const freeplay = createFreeplay(app);
+const lesson = createLesson(app);
+app.gotoStep = (n) => lesson.goto(n);
 
 // перетаскивание маркера (только в свободном режиме)
 let dragging = false;
@@ -241,3 +243,4 @@ addEventListener('resize', () => {
 renderer.setAnimationLoop(() => { controls.update(); renderer.render(scene, camera); });
 
 window.__app = app; // хук для QA-проверок
+lesson.goto(0);

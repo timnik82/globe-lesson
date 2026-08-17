@@ -63,6 +63,7 @@ export function createArcs(scene) {
   const lat = {
     show() { latArc.group.visible = true; },
     hide() { latArc.group.visible = false; },
+    isVisible: () => latArc.group.visible,
     orient(lon) {
       // X — направление на экватор в меридиане lon, Y — вверх
       const e = latLonToXYZ(0, lon);
@@ -90,6 +91,7 @@ export function createArcs(scene) {
   const lon = {
     show() { lonArc.group.visible = true; },
     hide() { lonArc.group.visible = false; },
+    isVisible: () => lonArc.group.visible,
     orient() {
       // X — направление на Гринвич (0,0,1), Y — на восток (1,0,0)
       lonArc.group.quaternion.copy(basisQuat(
