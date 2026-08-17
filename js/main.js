@@ -39,3 +39,11 @@ addEventListener('resize', () => {
 });
 
 renderer.setAnimationLoop(() => { controls.update(); renderer.render(scene, camera); });
+
+// временная проверка tween + labels (задача 3)
+import { makeLabelSprite } from './labels.js';
+import { tween } from './tween.js';
+const testLabel = makeLabelSprite('тест подписи', { color: '#ffd166' });
+testLabel.position.set(0, 1.3, 0);
+scene.add(testLabel);
+tween(2000, (k) => { testLabel.material.opacity = 0.3 + 0.7 * Math.abs(Math.sin(k * Math.PI * 3)); });
