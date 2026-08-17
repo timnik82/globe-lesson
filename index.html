@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Адрес на Земле — как читать координаты</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="css/style.css">
+<script type="importmap">
+{ "imports": { "three": "./vendor/three.module.js", "three/addons/": "./vendor/" } }
+</script>
+</head>
+<body>
+<div id="scene"></div>
+<div id="fallback" hidden>
+  <h2>Не работает 3D</h2>
+  <p>Ваш браузер не поддерживает WebGL. Откройте страницу в свежем Chrome, Edge, Firefox или Safari.</p>
+</div>
+<div id="mode-bar">
+  <button id="mode-lesson" class="mode-btn active">Урок</button>
+  <button id="mode-free" class="mode-btn">Свободно</button>
+  <button id="mode-game" class="mode-btn">Игра</button>
+  <button id="btn-help" title="Легенда">?</button>
+</div>
+<section id="lesson-panel" class="panel">
+  <h2 id="lesson-title"></h2>
+  <p id="lesson-text"></p>
+  <p id="lesson-extra" class="big"></p>
+  <div class="lesson-controls">
+    <button id="btn-prev">← Назад</button>
+    <span id="lesson-progress"></span>
+    <button id="btn-next">Дальше →</button>
+    <button id="btn-play" hidden>🎮 Играть</button>
+  </div>
+</section>
+<aside id="free-panel" class="panel" hidden>
+  <div id="coords-readout" class="big">—</div>
+  <label>Широта <input type="range" id="lat-slider" min="-90" max="90" step="1" value="56">
+    <span id="lat-val"></span></label>
+  <label>Долгота <input type="range" id="lon-slider" min="-180" max="180" step="1" value="38">
+    <span id="lon-val"></span></label>
+  <fieldset><legend>Слои</legend>
+    <label><input type="checkbox" id="lay-parallels"> параллели</label>
+    <label><input type="checkbox" id="lay-meridians"> меридианы</label>
+    <label><input type="checkbox" id="lay-equator" checked> экватор</label>
+    <label><input type="checkbox" id="lay-greenwich" checked> Гринвич</label>
+    <label><input type="checkbox" id="lay-arcs" checked> углы</label>
+    <label><input type="checkbox" id="lay-cities"> города</label>
+  </fieldset>
+  <div id="examples">
+    <button data-city="Москва">Москва</button>
+    <button data-city="Гринвич">Гринвич</button>
+    <button data-city="Северный полюс">Северный полюс</button>
+  </div>
+</aside>
+<section id="game-panel" class="panel" hidden>
+  <h2>Найди точку!</h2>
+  <p id="game-task" class="big"></p>
+  <p id="game-progress"></p>
+  <p id="game-result"></p>
+  <button id="game-next" hidden>Дальше →</button>
+  <div id="game-final" hidden>
+    <p id="game-score" class="big"></p>
+    <button id="game-restart">Ещё раз</button>
+  </div>
+</section>
+<div id="help-modal" hidden>
+  <div>
+    <h3>Легенда</h3>
+    <ul>
+      <li><span class="sw" style="background:#e63946"></span> экватор — 0° широты</li>
+      <li><span class="sw" style="background:#2a9d4f"></span> Гринвичский меридиан — 0° долготы</li>
+      <li><span class="sw" style="background:#f4a261"></span> угол широты: от экватора вверх/вниз</li>
+      <li><span class="sw" style="background:#57cc99"></span> угол долготы: от Гринвича на восток/запад</li>
+      <li><span class="sw" style="background:#ffd166"></span> маркер и линия 180°</li>
+    </ul>
+    <button id="help-close">Понятно</button>
+  </div>
+</div>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
