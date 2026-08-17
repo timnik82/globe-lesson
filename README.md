@@ -13,5 +13,7 @@
 (нужен любой локальный сервер — просто открыть файл двойным кликом нельзя,
 браузер не даёт ES-модулям работать с file://)
 
+Проверка логики координат (для разработчиков): node --test
+
 Дизайн: docs/superpowers/specs/2026-08-17-globe-coordinates-design.md
 План: docs/superpowers/plans/2026-08-17-globe-coordinates.md
