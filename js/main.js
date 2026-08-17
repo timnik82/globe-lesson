@@ -10,6 +10,7 @@ import { makeDynamicLabel } from './labels.js';
 import { tween, cancelAllTweens, tweenCamera } from './tween.js';
 import { createFreeplay } from './freeplay.js';
 import { createLesson } from './lesson.js';
+import { createGame } from './game.js';
 
 const container = document.getElementById('scene');
 let renderer;
@@ -168,6 +169,7 @@ const app = {
 const freeplay = createFreeplay(app);
 const lesson = createLesson(app);
 app.gotoStep = (n) => lesson.goto(n);
+game = createGame(app);
 
 // перетаскивание маркера (только в свободном режиме)
 let dragging = false;
