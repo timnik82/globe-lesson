@@ -79,5 +79,14 @@ export async function createGlobe(scene) {
   };
   const shells = { north: mkShell(0), south: mkShell(Math.PI / 2) };
 
-  return { group, sphereMesh, axisGroup, shells };
+  // «стеклянный» режим: когда показаны сектора-углы, глобус делается полупрозрачным,
+  // чтобы клин с вершиной в центре Земли был виден целиком
+  function setGlass(v) {
+    sphereMesh.material.transparent = v;
+    sphereMesh.material.opacity = v ? 0.45 : 1;
+    sphereMesh.material.depthWrite = !v;
+    sphereMesh.material.needsUpdate = true;
+  }
+
+  return { group, sphereMesh, axisGroup, shells, setGlass };
 }
