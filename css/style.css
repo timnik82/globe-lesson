@@ -14,12 +14,16 @@ button:disabled { opacity: .45; cursor: default; }
 .hint { font-size: 15px; opacity: .75; margin: 2px 0 6px; }
 #free-panel { top: 64px; right: 12px; width: 300px; }
 #free-panel label { display: block; margin: 6px 0; }
+#lat-val, #lon-val { white-space: nowrap; }
 #free-panel fieldset { border: 1px solid #33507e; margin-top: 10px; }
 #game-panel { left: 50%; transform: translateX(-50%); bottom: 12px; width: 480px; text-align: center; }
 .sw { display: inline-block; width: 16px; height: 16px; border-radius: 4px; vertical-align: -2px; margin-right: 6px; }
 #help-modal { position: fixed; inset: 0; background: rgba(0,0,0,.6); display: flex; align-items: center; justify-content: center; z-index: 10; }
 #help-modal[hidden] { display: none; }
 #help-modal > div { background: #13234a; padding: 20px 26px; border-radius: 12px; max-width: 420px; }
+.lang-row { display: flex; align-items: center; gap: 8px; margin-top: 16px; font-size: 14px; opacity: .8; }
+.lang-btn { font-size: 13px; padding: 3px 10px; }
+.lang-btn.active { background: #3d6db5; }
 #fallback { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; text-align: center; }
 #fallback[hidden] { display: none; }
 @media (max-width: 760px) { #free-panel { width: 240px; } body { font-size: 16px; } }

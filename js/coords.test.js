@@ -4,6 +4,7 @@ import {
   latLonToXYZ, xyzToLatLon, roundDeg, fmtLat, fmtLon, fmtCoords,
   angularDistanceDeg, starsForError,
 } from './coords.js';
+import { setLocale } from './i18n.js';
 
 const close = (a, b, eps = 1e-9) => assert.ok(Math.abs(a - b) < eps, `${a} != ${b}`);
 
@@ -43,6 +44,20 @@ test('формат долготы', () => {
 
 test('fmtCoords', () => {
   assert.equal(fmtCoords(55.7558, 37.6173), '56° с.ш., 38° в.д.');
+});
+
+test('формат координат на португальском', () => {
+  setLocale('pt');
+  try {
+    assert.equal(fmtLat(55.75), '56° N');
+    assert.equal(fmtLat(-22.9), '23° S');
+    assert.equal(fmtLon(37.6), '38° E');
+    assert.equal(fmtLon(-9.1), '9° O');
+    assert.equal(fmtCoords(55.7558, 37.6173), '56° N, 38° E');
+  } finally {
+    setLocale('ru'); // вернуть дефолт даже при упавшей проверке
+  }
+  assert.equal(fmtLat(55.75), '56° с.ш.');
 });
 
 test('угловое расстояние', () => {

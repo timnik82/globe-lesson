@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { latLonToXYZ } from './coords.js';
-import { makeLabelSprite } from './labels.js';
+import { makeLabelSprite, makeDynamicLabel } from './labels.js';
+import { t } from './i18n.js';
 
 function circle(lat, r, n = 160) {
   const pts = [];
@@ -58,7 +59,9 @@ export function createGraticule(scene) {
   }
 
   const equator = tubeFrom(circle(0, 1.004), true, 0.006, 0xe63946);
-  const equatorLabel = makeLabelSprite('ЭКВАТОР — 0° широты', { color: '#ffb3ba' });
+  const equatorLab = makeDynamicLabel({ color: '#ffb3ba' });
+  equatorLab.setText(t('labels.equator'));
+  const equatorLabel = equatorLab.sprite;
   {
     const p = latLonToXYZ(0, 60, 1.12);
     equatorLabel.position.set(p.x, p.y, p.z);
@@ -67,7 +70,9 @@ export function createGraticule(scene) {
   const greenwich = tubeFrom(
     meridianSeg(0, 1.004).concat(meridianSeg(180, 1.004).reverse()), false, 0.006, 0x2a9d4f
   );
-  const greenwichLabel = makeLabelSprite('Гринвичский меридиан — 0° долготы', { color: '#9fe6b0' });
+  const greenwichLab = makeDynamicLabel({ color: '#9fe6b0' });
+  greenwichLab.setText(t('labels.greenwich'));
+  const greenwichLabel = greenwichLab.sprite;
   {
     const p = latLonToXYZ(35, 0, 1.16);
     greenwichLabel.position.set(p.x, p.y, p.z);
@@ -122,6 +127,10 @@ export function createGraticule(scene) {
       rebuild(hiPar, circle(lat, 1.004), true);
       rebuild(hiMer, meridianSeg(lon, 1.004), false);
       hiPar.visible = hiMer.visible = true;
+    },
+    applyLocale() {
+      equatorLab.setText(t('labels.equator'));
+      greenwichLab.setText(t('labels.greenwich'));
     },
   };
 }
