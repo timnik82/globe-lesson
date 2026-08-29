@@ -1,3 +1,5 @@
+import { t } from './i18n.js';
+
 export const DEG = Math.PI / 180;
 export const RAD = 180 / Math.PI;
 
@@ -26,13 +28,13 @@ export function roundDeg(v) {
 export function fmtLat(lat) {
   const d = roundDeg(lat);
   if (d === 0) return '0°';
-  return d > 0 ? `${d}° с.ш.` : `${-d}° ю.ш.`;
+  return d > 0 ? `${d}° ${t('coords.latN')}` : `${-d}° ${t('coords.latS')}`;
 }
 
 export function fmtLon(lon) {
   const d = roundDeg(lon);
   if (d === 0 || Math.abs(d) === 180) return `${Math.abs(d)}°`;
-  return d > 0 ? `${d}° в.д.` : `${-d}° з.д.`;
+  return d > 0 ? `${d}° ${t('coords.lonE')}` : `${-d}° ${t('coords.lonW')}`;
 }
 
 export function fmtCoords(lat, lon) {

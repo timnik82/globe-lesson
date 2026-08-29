@@ -1,5 +1,6 @@
 import * as THREE from 'three';
-import { makeLabelSprite } from './labels.js';
+import { makeDynamicLabel } from './labels.js';
+import { t } from './i18n.js';
 
 const W = 2048, H = 1024;
 
@@ -61,11 +62,13 @@ export async function createGlobe(scene) {
     dot.position.set(0, 1.02 * s, 0);
     axisGroup.add(dot);
   }
-  const nLabel = makeLabelSprite('Северный полюс', { scale: 0.9 });
-  nLabel.position.set(0, 1.24, 0);
-  const sLabel = makeLabelSprite('Южный полюс', { scale: 0.9 });
-  sLabel.position.set(0, -1.24, 0);
-  axisGroup.add(nLabel, sLabel);
+  const nLab = makeDynamicLabel({ scale: 0.9 });
+  nLab.setText(t('poles.north'));
+  nLab.sprite.position.set(0, 1.24, 0);
+  const sLab = makeDynamicLabel({ scale: 0.9 });
+  sLab.setText(t('poles.south'));
+  sLab.sprite.position.set(0, -1.24, 0);
+  axisGroup.add(nLab.sprite, sLab.sprite);
   group.add(axisGroup);
 
   // полусферы для «моргания» полушарий (шаг 2 урока)
@@ -88,5 +91,11 @@ export async function createGlobe(scene) {
     sphereMesh.material.needsUpdate = true;
   }
 
-  return { group, sphereMesh, axisGroup, shells, setGlass };
+  return {
+    group, sphereMesh, axisGroup, shells, setGlass,
+    applyLocale() {
+      nLab.setText(t('poles.north'));
+      sLab.setText(t('poles.south'));
+    },
+  };
 }

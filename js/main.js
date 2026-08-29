@@ -5,12 +5,13 @@ import { createGlobe } from './globe.js';
 import { createGraticule } from './graticule.js';
 import { createArcs } from './angles.js';
 import { createMarker } from './marker.js';
-import { CITIES } from './cities.js';
+import { CITIES, cityName } from './cities.js';
 import { makeDynamicLabel } from './labels.js';
 import { tween, cancelAllTweens, tweenCamera } from './tween.js';
 import { createFreeplay } from './freeplay.js';
 import { createLesson } from './lesson.js';
 import { createGame } from './game.js';
+import { getLocale, setLocale, onChange, applyStatic } from './i18n.js';
 
 const container = document.getElementById('scene');
 let renderer;
@@ -93,7 +94,7 @@ function hoverCity(e) {
   const hits = raycaster.intersectObject(citiesLayer, true);
   if (hits.length) {
     const c = hits[0].object.userData.city;
-    cityHoverLabel.setText(c.name);
+    cityHoverLabel.setText(cityName(c));
     cityHoverLabel.sprite.visible = true;
     const p = latLonToXYZ(c.lat, c.lon, 1.09);
     cityHoverLabel.sprite.position.set(p.x, p.y, p.z);
@@ -170,6 +171,30 @@ const freeplay = createFreeplay(app);
 const lesson = createLesson(app);
 app.gotoStep = (n) => lesson.goto(n);
 game = createGame(app);
+
+// язык: русский по умолчанию, переключатель спрятан в окне справки
+applyStatic();
+const langButtons = {
+  ru: document.getElementById('lang-ru'),
+  pt: document.getElementById('lang-pt'),
+};
+function syncLangButtons() {
+  for (const [loc, btn] of Object.entries(langButtons)) {
+    btn.classList.toggle('active', getLocale() === loc);
+  }
+}
+for (const [loc, btn] of Object.entries(langButtons)) {
+  btn.addEventListener('click', () => setLocale(loc));
+}
+onChange(() => {
+  syncLangButtons();
+  globe.applyLocale();
+  grat.applyLocale();
+  if (state.mode === 'lesson') lesson.goto(state.step);
+  else if (state.mode === 'free') freeplay.update(state.lat, state.lon);
+  else if (state.mode === 'game') game.refresh();
+});
+syncLangButtons();
 
 // перетаскивание маркера (только в свободном режиме)
 let dragging = false;
@@ -248,4 +273,5 @@ addEventListener('resize', () => {
 renderer.setAnimationLoop(() => { controls.update(); renderer.render(scene, camera); });
 
 window.__app = app; // хук для QA-проверок
+app.setLocale = setLocale;
 lesson.goto(0);

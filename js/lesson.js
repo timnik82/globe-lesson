@@ -1,10 +1,11 @@
 import { tween, cancelAllTweens } from './tween.js';
-import { CITIES } from './cities.js';
+import { CITIES, cityName } from './cities.js';
 import { fmtCoords, latLonToXYZ } from './coords.js';
+import { t } from './i18n.js';
 
 const MOSCOW = CITIES[0];
-const RIO = CITIES.find((c) => c.name === 'Рио-де-Жанейро');
-const NY = CITIES.find((c) => c.name === 'Нью-Йорк');
+const RIO = CITIES.find((c) => c.id === 'rio');
+const NY = CITIES.find((c) => c.id === 'newyork');
 const GREENWICH = { lat: 51.4779, lon: 0 };
 
 // камера лицом к плоскости меридиана lon — чтобы угол читался как на транспортире
@@ -15,24 +16,21 @@ function cameraInMeridian(lon, y = 0.25) {
 
 export const LESSON_STEPS = [
   {
-    title: 'Это Земля',
-    text: 'Это наша планета Земля. У каждой точки на ней есть точный адрес — как у дома. Сейчас узнаем, как его записывают!',
+    id: 'earth',
     camera: { pos: [0, 0.8, 3.2], target: [0, 0, 0] },
     enter(app) {
-      app.ui.lessonExtra.textContent = 'Покрути глобус мышкой!';
+      app.ui.lessonExtra.textContent = t('lesson.spinHint');
       app.controls.autoRotate = true;
       app.controls.autoRotateSpeed = 0.5;
     },
   },
   {
-    title: 'Ось и полюса',
-    text: 'Земля вращается вокруг воображаемой оси. Точки, где ось выходит из Земли, — Северный и Южный полюса.',
+    id: 'axis',
     camera: { pos: [2.2, 1.6, 2.2], target: [0, 0, 0] },
     enter(app) { app.globe.axisGroup.visible = true; },
   },
   {
-    title: 'Экватор',
-    text: 'Посередине между полюсами — главная линия: экватор. Он делит Землю на Северное и Южное полушария.',
+    id: 'equator',
     camera: { pos: [0, 1.2, 3.1], target: [0, 0, 0] },
     async enter(app) {
       app.globe.axisGroup.visible = true;
@@ -46,8 +44,7 @@ export const LESSON_STEPS = [
     },
   },
   {
-    title: 'Параллели',
-    text: 'Параллели — круги параллельно экватору. Чем ближе к полюсу, тем круг меньше. По ним будем считать широту.',
+    id: 'parallels',
     camera: { pos: [0, 1.6, 3.0], target: [0, 0, 0] },
     enter(app) {
       app.globe.axisGroup.visible = true;
@@ -55,8 +52,7 @@ export const LESSON_STEPS = [
     },
   },
   {
-    title: 'Измеряем широту',
-    text: 'Широта — угол от экватора до точки. От экватора вверх до Москвы — 56°. Это 56° северной широты. Вверх — северная (с.ш.), вниз — южная (ю.ш.), от 0° до 90°.',
+    id: 'measureLat',
     camera: cameraInMeridian(MOSCOW.lon),
     async enter(app) {
       app.grat.setLayers({ equator: true, parallels: true });
@@ -74,8 +70,7 @@ export const LESSON_STEPS = [
     },
   },
   {
-    title: 'Нулевой меридиан',
-    text: 'Договорились: меридиан, проходящий через Гринвич (рядом с Лондоном), — это 0° долготы. От него и считают.',
+    id: 'primeMeridian',
     camera: { pos: [0.7, 1.2, 3.0], target: [0, 0, 0] },
     enter(app) {
       app.globe.setGlass(false);
@@ -86,8 +81,7 @@ export const LESSON_STEPS = [
     },
   },
   {
-    title: 'Меридианы',
-    text: 'Меридианы соединяют полюса, как дольки апельсина. Все они одинаковой длины.',
+    id: 'meridians',
     camera: { pos: [0, 2.2, 2.4], target: [0, 0, 0] },
     enter(app) {
       app.globe.axisGroup.visible = true;
@@ -96,8 +90,7 @@ export const LESSON_STEPS = [
     },
   },
   {
-    title: 'Измеряем долготу',
-    text: 'Долгота — угол от Гринвичского меридиана до меридиана точки. От Гринвича на восток до Москвы — 38° восточной долготы (в.д.). На восток — в.д., на запад — з.д. Считают до 180°: половина круга на восток, половина на запад.',
+    id: 'measureLon',
     camera: cameraInMeridian(MOSCOW.lon / 2 - 90, 0.4),
     async enter(app) {
       app.grat.setLayers({ equator: true, greenwich: true, meridians: true });
@@ -117,8 +110,7 @@ export const LESSON_STEPS = [
     },
   },
   {
-    title: 'Координаты — адрес точки',
-    text: 'Место, где пересекаются параллель 56° с.ш. и меридиан 38° в.д., — Москва. Широта и долгота вместе — это географические координаты, адрес точки на Земле!',
+    id: 'coords',
     camera: { pos: [1.8, 1.4, 2.4], target: [0, 0, 0] },
     enter(app) {
       app.grat.setLayers({ equator: true, greenwich: true, parallels: true, meridians: true });
@@ -129,12 +121,14 @@ export const LESSON_STEPS = [
       app.arcs.lat.set(MOSCOW.lat, MOSCOW.lon);
       app.arcs.lon.set(MOSCOW.lon);
       app.grat.setPointHighlight(MOSCOW.lat, MOSCOW.lon);
-      app.ui.lessonExtra.textContent = `Москва: ${fmtCoords(MOSCOW.lat, MOSCOW.lon)}`;
+      app.ui.lessonExtra.textContent = t('lesson.cityCoords', {
+        city: cityName(MOSCOW),
+        coords: fmtCoords(MOSCOW.lat, MOSCOW.lon),
+      });
     },
   },
   {
-    title: 'Проверь себя!',
-    text: 'А теперь попробуй сам находить точки по координатам!',
+    id: 'quiz',
     camera: { pos: [0, 0.8, 3.2], target: [0, 0, 0] },
     enter(app) {
       app.globe.setGlass(false);
@@ -205,9 +199,9 @@ export function createLesson(app) {
     n = Math.max(0, Math.min(LESSON_STEPS.length - 1, n));
     app.state.step = n;
     const s = LESSON_STEPS[n];
-    app.ui.lessonTitle.textContent = s.title;
-    app.ui.lessonText.textContent = s.text;
-    app.ui.lessonProgress.textContent = `Шаг ${n + 1} из ${LESSON_STEPS.length}`;
+    app.ui.lessonTitle.textContent = t(`lesson.steps.${s.id}.title`);
+    app.ui.lessonText.textContent = t(`lesson.steps.${s.id}.text`);
+    app.ui.lessonProgress.textContent = t('lesson.progress', { n: n + 1, m: LESSON_STEPS.length });
     app.ui.btnPrev.disabled = n === 0;
     app.ui.btnNext.disabled = n === LESSON_STEPS.length - 1;
     await app.tweenCamera(s.camera, 1100);

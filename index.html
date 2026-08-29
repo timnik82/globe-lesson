@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Адрес на Земле — как читать координаты</title>
+<title data-i18n="meta.title">Адрес на Земле — как читать координаты</title>
 <link rel="icon" href="data:,">
 <link rel="stylesheet" href="css/style.css">
 <script type="importmap">
@@ -13,69 +13,74 @@
 <body>
 <div id="scene"></div>
 <div id="fallback" hidden>
-  <h2>Не работает 3D</h2>
-  <p>Ваш браузер не поддерживает WebGL. Откройте страницу в свежем Chrome, Edge, Firefox или Safari.</p>
+  <h2 data-i18n="fallback.title">Не работает 3D</h2>
+  <p data-i18n="fallback.text">Ваш браузер не поддерживает WebGL. Откройте страницу в свежем Chrome, Edge, Firefox или Safari.</p>
 </div>
 <div id="mode-bar">
-  <button id="mode-lesson" class="mode-btn active">Урок</button>
-  <button id="mode-free" class="mode-btn">Свободно</button>
-  <button id="mode-game" class="mode-btn">Игра</button>
-  <button id="btn-help" title="Легенда">?</button>
+  <button id="mode-lesson" class="mode-btn active" data-i18n="modes.lesson">Урок</button>
+  <button id="mode-free" class="mode-btn" data-i18n="modes.free">Свободно</button>
+  <button id="mode-game" class="mode-btn" data-i18n="modes.game">Игра</button>
+  <button id="btn-help" data-i18n-title="help.buttonTitle" title="Легенда">?</button>
 </div>
 <section id="lesson-panel" class="panel">
   <h2 id="lesson-title"></h2>
   <p id="lesson-text"></p>
   <p id="lesson-extra" class="big"></p>
   <div class="lesson-controls">
-    <button id="btn-prev">← Назад</button>
+    <button id="btn-prev" data-i18n="ui.prev">← Назад</button>
     <span id="lesson-progress"></span>
-    <button id="btn-next">Дальше →</button>
-    <button id="btn-play" hidden>🎮 Играть</button>
+    <button id="btn-next" data-i18n="ui.next">Дальше →</button>
+    <button id="btn-play" hidden data-i18n="ui.play">🎮 Играть</button>
   </div>
 </section>
 <aside id="free-panel" class="panel" hidden>
   <div id="coords-readout" class="big">—</div>
-  <p class="hint">Тяни жёлтую булавку мышкой или двигай ползунки</p>
-  <label>Широта <input type="range" id="lat-slider" min="-90" max="90" step="1" value="56">
+  <p class="hint" data-i18n="free.hint">Тяни жёлтую булавку мышкой или двигай ползунки</p>
+  <label><span data-i18n="free.lat">Широта</span> <input type="range" id="lat-slider" min="-90" max="90" step="1" value="56">
     <span id="lat-val"></span></label>
-  <label>Долгота <input type="range" id="lon-slider" min="-180" max="180" step="1" value="38">
+  <label><span data-i18n="free.lon">Долгота</span> <input type="range" id="lon-slider" min="-180" max="180" step="1" value="38">
     <span id="lon-val"></span></label>
-  <fieldset><legend>Слои</legend>
-    <label><input type="checkbox" id="lay-parallels"> параллели</label>
-    <label><input type="checkbox" id="lay-meridians"> меридианы</label>
-    <label><input type="checkbox" id="lay-equator" checked> экватор</label>
-    <label><input type="checkbox" id="lay-greenwich" checked> Гринвич</label>
-    <label><input type="checkbox" id="lay-arcs" checked> углы</label>
-    <label><input type="checkbox" id="lay-cities"> города</label>
+  <fieldset><legend data-i18n="free.layers">Слои</legend>
+    <label><input type="checkbox" id="lay-parallels"> <span data-i18n="free.parallels">параллели</span></label>
+    <label><input type="checkbox" id="lay-meridians"> <span data-i18n="free.meridians">меридианы</span></label>
+    <label><input type="checkbox" id="lay-equator" checked> <span data-i18n="free.equator">экватор</span></label>
+    <label><input type="checkbox" id="lay-greenwich" checked> <span data-i18n="free.greenwich">Гринвич</span></label>
+    <label><input type="checkbox" id="lay-arcs" checked> <span data-i18n="free.arcs">углы</span></label>
+    <label><input type="checkbox" id="lay-cities"> <span data-i18n="free.cities">города</span></label>
   </fieldset>
   <div id="examples">
-    <button data-city="Москва">Москва</button>
-    <button data-city="Гринвич">Гринвич</button>
-    <button data-city="Северный полюс">Северный полюс</button>
+    <button data-city="moscow" data-i18n="cities.moscow">Москва</button>
+    <button data-city="greenwich" data-i18n="cities.greenwich">Гринвич</button>
+    <button data-city="north-pole" data-i18n="poles.north">Северный полюс</button>
   </div>
 </aside>
 <section id="game-panel" class="panel" hidden>
-  <h2>Найди точку!</h2>
+  <h2 data-i18n="game.title">Найди точку!</h2>
   <p id="game-task" class="big"></p>
   <p id="game-progress"></p>
   <p id="game-result"></p>
-  <button id="game-next" hidden>Дальше →</button>
+  <button id="game-next" hidden data-i18n="ui.next">Дальше →</button>
   <div id="game-final" hidden>
     <p id="game-score" class="big"></p>
-    <button id="game-restart">Ещё раз</button>
+    <button id="game-restart" data-i18n="game.restart">Ещё раз</button>
   </div>
 </section>
 <div id="help-modal" hidden>
   <div>
-    <h3>Легенда</h3>
+    <h3 data-i18n="help.title">Легенда</h3>
     <ul>
-      <li><span class="sw" style="background:#e63946"></span> экватор — 0° широты</li>
-      <li><span class="sw" style="background:#2a9d4f"></span> Гринвичский меридиан — 0° долготы</li>
-      <li><span class="sw" style="background:#f4a261"></span> угол широты: от экватора вверх/вниз</li>
-      <li><span class="sw" style="background:#57cc99"></span> угол долготы: от Гринвича на восток/запад</li>
-      <li><span class="sw" style="background:#ffd166"></span> маркер и линия 180°</li>
+      <li><span class="sw" style="background:#e63946"></span><span data-i18n="help.items.equator">экватор — 0° широты</span></li>
+      <li><span class="sw" style="background:#2a9d4f"></span><span data-i18n="help.items.greenwich">Гринвичский меридиан — 0° долготы</span></li>
+      <li><span class="sw" style="background:#f4a261"></span><span data-i18n="help.items.latAngle">угол широты: от экватора вверх/вниз</span></li>
+      <li><span class="sw" style="background:#57cc99"></span><span data-i18n="help.items.lonAngle">угол долготы: от Гринвича на восток/запад</span></li>
+      <li><span class="sw" style="background:#ffd166"></span><span data-i18n="help.items.m180">маркер и линия 180°</span></li>
     </ul>
-    <button id="help-close">Понятно</button>
+    <button id="help-close" data-i18n="help.close">Понятно</button>
+    <div class="lang-row">
+      <span data-i18n="help.language">Язык</span>
+      <button id="lang-ru" class="lang-btn active" type="button">Русский</button>
+      <button id="lang-pt" class="lang-btn" type="button">Português</button>
+    </div>
   </div>
 </div>
 <script type="module" src="js/main.js"></script>

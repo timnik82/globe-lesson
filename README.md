@@ -15,5 +15,15 @@
 
 Проверка логики координат (для разработчиков): node --test
 
+## Языки
+
+Интерфейс на русском; европейский португальский включается кнопкой «Português»
+в окне справки («?»). Все тексты лежат в словарях `js/locales/ru.js` и
+`js/locales/pt.js`, строки разметки помечены атрибутами `data-i18n`.
+
+Новый язык: создать файл в `js/locales/`, импортировать его в `js/i18n.js`
+(в `LOCALES`) и добавить кнопку в блок `.lang-row` в `index.html` — тест
+паритета ключей (`node --test`) не даст пропустить строки.
+
 Дизайн: docs/superpowers/specs/2026-08-17-globe-coordinates-design.md
 План: docs/superpowers/plans/2026-08-17-globe-coordinates.md
