@@ -11,6 +11,7 @@ button:disabled { opacity: .45; cursor: default; }
 #lesson-panel h2 { font-size: 24px; margin-bottom: 6px; }
 .lesson-controls { display: flex; align-items: center; gap: 14px; margin-top: 10px; }
 .big { font-size: 24px; font-weight: 700; margin: 6px 0; }
+.hint { font-size: 15px; opacity: .75; margin: 2px 0 6px; }
 #free-panel { top: 64px; right: 12px; width: 300px; }
 #free-panel label { display: block; margin: 6px 0; }
 #free-panel fieldset { border: 1px solid #33507e; margin-top: 10px; }

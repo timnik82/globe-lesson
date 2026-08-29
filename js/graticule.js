@@ -111,8 +111,11 @@ export function createGraticule(scene) {
       this.setMeridian180(true);
       const mat = meridian180.material;
       mat.transparent = true;
-      await tween(2400, (k) => { mat.opacity = 0.35 + 0.65 * Math.abs(Math.sin(k * Math.PI * 3)); });
-      mat.opacity = 1;
+      try {
+        await tween(2400, (k) => { mat.opacity = 0.35 + 0.65 * Math.abs(Math.sin(k * Math.PI * 3)); });
+      } finally {
+        mat.opacity = 1; // даже если пульс отменили посреди — линия не остаётся «полупрозрачной»
+      }
     },
     setPointHighlight(lat, lon) {
       if (lat === null) { hiPar.visible = hiMer.visible = false; return; }

@@ -35,8 +35,25 @@ export function createFreeplay(app) {
     }
   }
 
-  latSlider.addEventListener('input', () => update(+latSlider.value, state.lon, true));
-  lonSlider.addEventListener('input', () => update(state.lat, +lonSlider.value, true));
+  // перетаскивание и слайдеры шлют события чаще, чем кадры; собираем в один update на кадр
+  let pendingUpdate = null;
+  let updateRaf = 0;
+  function scheduleUpdate(lat, lon, fromSlider = false) {
+    pendingUpdate = [lat, lon, fromSlider];
+    if (!updateRaf) {
+      updateRaf = requestAnimationFrame(() => {
+        updateRaf = 0;
+        if (pendingUpdate) {
+          const [la, lo, fs] = pendingUpdate;
+          pendingUpdate = null;
+          update(la, lo, fs);
+        }
+      });
+    }
+  }
+
+  latSlider.addEventListener('input', () => scheduleUpdate(+latSlider.value, state.lon, true));
+  lonSlider.addEventListener('input', () => scheduleUpdate(state.lat, +lonSlider.value, true));
   for (const box of [layParallels, layMeridians, layEquator, layGreenwich, layArcs, layCities]) {
     box.addEventListener('change', applyLayers);
   }
@@ -56,5 +73,6 @@ export function createFreeplay(app) {
     },
     leave() {},
     update,
+    schedule: scheduleUpdate,
   };
 }
