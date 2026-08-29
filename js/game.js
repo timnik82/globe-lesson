@@ -111,6 +111,9 @@ export function createGame(app) {
       return;
     }
     const city = order[idx];
+    // подписи углов на глобусе рисуются в момент ответа — при смене языка их надо перерисовать
+    if (arcs.lat.isVisible()) arcs.lat.set(city.lat, city.lon);
+    if (arcs.lon.isVisible()) arcs.lon.set(city.lon);
     ui.gameTask.textContent = t('game.find', { coords: fmtCoords(city.lat, city.lon) });
     ui.gameProgress.textContent = t('game.round', { n: idx + 1, m: order.length, score });
     if (answered && lastErr !== null) {

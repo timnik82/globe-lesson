@@ -48,12 +48,15 @@ test('fmtCoords', () => {
 
 test('формат координат на португальском', () => {
   setLocale('pt');
-  assert.equal(fmtLat(55.75), '56° N');
-  assert.equal(fmtLat(-22.9), '23° S');
-  assert.equal(fmtLon(37.6), '38° E');
-  assert.equal(fmtLon(-9.1), '9° O');
-  assert.equal(fmtCoords(55.7558, 37.6173), '56° N, 38° E');
-  setLocale('ru'); // вернуть дефолт для остальных тестов
+  try {
+    assert.equal(fmtLat(55.75), '56° N');
+    assert.equal(fmtLat(-22.9), '23° S');
+    assert.equal(fmtLon(37.6), '38° E');
+    assert.equal(fmtLon(-9.1), '9° O');
+    assert.equal(fmtCoords(55.7558, 37.6173), '56° N, 38° E');
+  } finally {
+    setLocale('ru'); // вернуть дефолт даже при упавшей проверке
+  }
   assert.equal(fmtLat(55.75), '56° с.ш.');
 });
 

@@ -1,7 +1,11 @@
 import * as THREE from 'three';
 
 function draw(canvas, text, { size, color, bg, pad }) {
-  const c = canvas.getContext('2d');
+  // willReadFrequently → софтверный канвас: GPU-поверхности нет, и текстура
+  // после ресайза заливается целиком. Без него Chromium копирует текстуру
+  // частями со старыми размерами (GL_INVALID_VALUE) и на глобусе остаётся
+  // смесь старого и нового текста
+  const c = canvas.getContext('2d', { willReadFrequently: true });
   const font = `bold ${size}px system-ui, sans-serif`;
   c.font = font;
   const w = Math.ceil(c.measureText(text).width) + pad * 2;
@@ -41,7 +45,12 @@ export function makeDynamicLabel(opts = {}) {
     sprite: spr,
     setText(text) {
       const { w: nw, h: nh } = draw(canvas, text, o);
-      spr.material.map.needsUpdate = true;
+      // needsUpdate после первого аплоада в Chrome не перезаливает канвас
+      // надёжно (видели и зависший текст, и «хвосты» старых строк) —
+      // пересоздаём текстуру целиком, это единственный стабильный путь
+      spr.material.map.dispose();
+      spr.material.map = new THREE.CanvasTexture(canvas);
+      spr.material.map.colorSpace = THREE.SRGBColorSpace;
       spr.userData.setSize(nw, nh);
     },
   };

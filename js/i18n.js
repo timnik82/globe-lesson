@@ -1,8 +1,11 @@
 import { ru } from './locales/ru.js';
 import { pt } from './locales/pt.js';
 
-const LOCALES = { ru, pt };
+export const LOCALES = { ru, pt };
 export const DEFAULT_LOCALE = 'ru';
+
+// региональный вариант в <html lang> по BCP 47: португальский здесь — именно европейский
+const HTML_LANG = { ru: 'ru', pt: 'pt-PT' };
 
 let current = DEFAULT_LOCALE;
 const listeners = new Set();
@@ -13,7 +16,7 @@ export function setLocale(loc) {
   if (!LOCALES[loc] || loc === current) return;
   current = loc;
   if (typeof document !== 'undefined') {
-    document.documentElement.lang = loc;
+    document.documentElement.lang = HTML_LANG[loc] ?? loc;
     applyStatic();
   }
   for (const fn of listeners) fn(loc);

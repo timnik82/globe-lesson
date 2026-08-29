@@ -188,6 +188,7 @@ for (const [loc, btn] of Object.entries(langButtons)) {
 }
 onChange(() => {
   syncLangButtons();
+  cityHoverLabel.sprite.visible = false; // висящая подпись города осталась бы на старом языке
   globe.applyLocale();
   grat.applyLocale();
   if (state.mode === 'lesson') lesson.goto(state.step);
