@@ -13,6 +13,9 @@ function shuffle(a) {
 export function createGame(app) {
   const { ui, grat, arcs, marker, globe } = app;
   let order = [], idx = 0, score = 0, answered = false;
+  // номер поколения раунда: любой новый раунд/финал/выход из игры
+  // делает старые цепочки анимаций неактуальными
+  let roundId = 0;
 
   // зелёная точка правильного ответа
   const answerPin = new app.THREE.Mesh(
@@ -23,6 +26,7 @@ export function createGame(app) {
   app.scene.add(answerPin);
 
   function newRound() {
+    roundId++;
     answered = false;
     const city = order[idx];
     ui.gameTask.textContent = `Найди: ${fmtCoords(city.lat, city.lon)}`;
@@ -42,6 +46,7 @@ export function createGame(app) {
   async function handleAnswer(lat, lon) {
     if (answered) return;
     answered = true;
+    const my = roundId;
     const city = order[idx];
     const err = angularDistanceDeg(lat, lon, city.lat, city.lon);
     const stars = starsForError(err);
@@ -56,8 +61,14 @@ export function createGame(app) {
       '⭐'.repeat(stars) + '✩'.repeat(3 - stars);
     ui.gameProgress.textContent = `Раунд ${idx + 1} из ${order.length} · ⭐ ${score}`;
     globe.setGlass(true);
+    // повернуть глобус к городу, чтобы ребёнок увидел, где он находится
+    const camPos = latLonToXYZ(22, city.lon, 3.2);
+    await app.tweenCamera({ pos: [camPos.x, camPos.y, camPos.z], target: [0, 0, 0] }, 800);
+    if (my !== roundId) return;
     await arcs.lat.grow(city.lat, city.lon, 900);
+    if (my !== roundId) return;
     await arcs.lon.grow(city.lon, 900);
+    if (my !== roundId) return;
     ui.gameNext.hidden = false;
   }
 
@@ -65,8 +76,10 @@ export function createGame(app) {
     idx++;
     if (idx < order.length) newRound();
     else {
+      roundId++; // убить анимации последнего ответа
       ui.gameTask.textContent = 'Игра пройдена!';
       ui.gameResult.textContent = '';
+      ui.gameProgress.textContent = '';
       ui.gameNext.hidden = true;
       ui.gameScore.textContent = `Твои звёзды: ${score} из ${order.length * 3}`;
       ui.gameFinal.hidden = false;
@@ -88,5 +101,9 @@ export function createGame(app) {
     newRound();
   }
 
-  return { enter, handleAnswer };
+  return {
+    enter,
+    handleAnswer,
+    invalidate: () => { roundId++; },
+  };
 }

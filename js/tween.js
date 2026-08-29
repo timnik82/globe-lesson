@@ -10,11 +10,11 @@ export function tween(ms, onUpdate, ease = easeInOut) {
     active.add(rec);
     const t0 = performance.now();
     requestAnimationFrame(function frame(now) {
-      if (rec.stop) { active.delete(rec); resolve(); return; }
+      if (rec.stop) { active.delete(rec); resolve(false); return; }
       const t = Math.min(1, (now - t0) / ms);
       onUpdate(ease(t), t);
       if (t < 1) requestAnimationFrame(frame);
-      else { active.delete(rec); resolve(); }
+      else { active.delete(rec); resolve(true); }
     });
   });
 }
@@ -30,10 +30,12 @@ export async function tweenCamera(camera, controls, { pos, target }, ms = 1200) 
   const p1 = new THREE.Vector3(...pos);
   const t1 = new THREE.Vector3(...target);
   controls.enabled = false;
-  await tween(ms, (k) => {
+  const finished = await tween(ms, (k) => {
     camera.position.lerpVectors(p0, p1, k);
     controls.target.lerpVectors(t0, t1, k);
     controls.update();
   });
-  controls.enabled = true;
+  // отменённый полёт не должен возвращать управление — его вернёт тот,
+  // кто стартует следующий полёт, или setMode (иначе полёты дерутся)
+  if (finished) controls.enabled = true;
 }

@@ -182,7 +182,7 @@ renderer.domElement.addEventListener('pointerdown', (e) => {
 renderer.domElement.addEventListener('pointermove', (e) => {
   if (state.mode === 'free' && dragging) {
     const ll = raycastSphere(e);
-    if (ll) freeplay.update(ll.lat, ll.lon);
+    if (ll) freeplay.schedule(ll.lat, ll.lon);
   } else if (state.mode === 'free' && citiesLayer.visible) {
     hoverCity(e);
   } else if (state.mode === 'free') {
@@ -213,6 +213,9 @@ renderer.domElement.addEventListener('pointerup', (e) => {
 function setMode(mode) {
   cancelAllTweens();
   clearTracked();
+  if (lesson) lesson.invalidate(); // убить цепочку анимаций шага урока
+  if (game) game.invalidate();     // и анимации ответа в игре
+  controls.enabled = true;         // отменённый полёт камеры управление не возвращает
   state.mode = mode;
   for (const id of ['lesson', 'free', 'game']) {
     document.getElementById('mode-' + id).classList.toggle('active', mode === id);

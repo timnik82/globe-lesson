@@ -19,6 +19,7 @@ export const LESSON_STEPS = [
     text: 'Это наша планета Земля. У каждой точки на ней есть точный адрес — как у дома. Сейчас узнаем, как его записывают!',
     camera: { pos: [0, 0.8, 3.2], target: [0, 0, 0] },
     enter(app) {
+      app.ui.lessonExtra.textContent = 'Покрути глобус мышкой!';
       app.controls.autoRotate = true;
       app.controls.autoRotateSpeed = 0.5;
     },
@@ -38,8 +39,8 @@ export const LESSON_STEPS = [
       app.grat.setLayers({ equator: true });
       const { north, south } = app.globe.shells;
       for (let i = 0; i < 2; i++) {
-        await tween(700, (k) => north.setGlow(Math.sin(k * Math.PI)));
-        await tween(700, (k) => south.setGlow(Math.sin(k * Math.PI)));
+        await app.tween(700, (k) => north.setGlow(Math.sin(k * Math.PI)));
+        await app.tween(700, (k) => south.setGlow(Math.sin(k * Math.PI)));
       }
       north.setGlow(0); south.setGlow(0);
     },
@@ -97,7 +98,7 @@ export const LESSON_STEPS = [
   {
     title: 'Измеряем долготу',
     text: 'Долгота — угол от Гринвичского меридиана до меридиана точки. От Гринвича на восток до Москвы — 38° восточной долготы (в.д.). На восток — в.д., на запад — з.д. Считают до 180°: половина круга на восток, половина на запад.',
-    camera: cameraInMeridian(MOSCOW.lon / 2 + 90, 0.4),
+    camera: cameraInMeridian(MOSCOW.lon / 2 - 90, 0.4),
     async enter(app) {
       app.grat.setLayers({ equator: true, greenwich: true, meridians: true });
       app.globe.setGlass(true);
@@ -106,12 +107,13 @@ export const LESSON_STEPS = [
       await app.sleepTracked(500);
       await app.arcs.lon.grow(MOSCOW.lon, 1800);
       await app.sleepTracked(1400);
-      await app.tweenCamera(cameraInMeridian(NY.lon / 2 + 90, 0.4), 1100);
+      await app.tweenCamera(cameraInMeridian(NY.lon / 2 - 90, 0.4), 1100);
       app.arcs.lon.hide();
+      app.marker.setLatLon(NY.lat, NY.lon); // второй пример — булавка переезжает в Нью-Йорк
       await app.sleepTracked(300);
       await app.arcs.lon.grow(NY.lon, 1600); // на запад, «74° з.д.»
       await app.sleepTracked(900);
-      await app.grat.pulseMeridian180(tween);
+      await app.grat.pulseMeridian180(app.tween);
     },
   },
   {
@@ -165,8 +167,40 @@ export function createLesson(app) {
     app.ui.btnPlay.hidden = true;
   }
 
+  // Защита от гонок: у каждого goto свой номер поколения. Анимации шага ждут
+  // через защищённые хелперы — как только поколение сменилось, они отклоняются
+  // со STALE и цепочка старого шага умирает, не трогая сцену нового.
+  let runId = 0;
+  const STALE = Symbol('stale');
+
+  function makeStepTools() {
+    const id = runId;
+    const stale = () => id !== runId;
+    return {
+      sleepTracked: (ms) => new Promise((res, rej) => {
+        if (stale()) { rej(STALE); return; }
+        setTimeout(() => (stale() ? rej(STALE) : res()), ms);
+      }),
+      tween: (ms, fn) => {
+        if (stale()) return Promise.reject(STALE);
+        return tween(ms, fn).then((finished) => {
+          if (!finished || stale()) throw STALE;
+        });
+      },
+      tweenCamera: (cam, ms) => {
+        if (stale()) return Promise.reject(STALE);
+        return app.tweenCamera(cam, ms).then(() => {
+          if (stale()) throw STALE;
+        });
+      },
+    };
+  }
+
   async function goto(n) {
+    const myRun = ++runId;
+    const stale = () => myRun !== runId;
     cancelAllTweens();
+    app.controls.enabled = true; // отменённые полёты управление не возвращают
     resetScene();
     n = Math.max(0, Math.min(LESSON_STEPS.length - 1, n));
     app.state.step = n;
@@ -177,12 +211,24 @@ export function createLesson(app) {
     app.ui.btnPrev.disabled = n === 0;
     app.ui.btnNext.disabled = n === LESSON_STEPS.length - 1;
     await app.tweenCamera(s.camera, 1100);
-    await s.enter?.(app);
+    if (stale()) return;
+    const tools = makeStepTools();
+    const ctx = Object.create(app);
+    Object.assign(ctx, tools);
+    try {
+      await s.enter?.(ctx);
+    } catch (e) {
+      if (e !== STALE) console.error(e);
+    }
   }
 
   app.ui.btnPrev.addEventListener('click', () => goto(app.state.step - 1));
   app.ui.btnNext.addEventListener('click', () => goto(app.state.step + 1));
   app.ui.btnPlay.addEventListener('click', () => app.setMode('game'));
 
-  return { goto };
+  return {
+    goto,
+    // выход из режима урока посреди анимации — убить цепочку шага
+    invalidate: () => { runId++; },
+  };
 }
