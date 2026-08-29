@@ -43,7 +43,10 @@ export function makeDynamicLabel(opts = {}) {
   const spr = makeSprite(canvas, { w, h, scale: o.scale });
   return {
     sprite: spr,
+    lastText: '',
     setText(text) {
+      if (text === this.lastText) return; // без работы — без новой текстуры
+      this.lastText = text;
       const { w: nw, h: nh } = draw(canvas, text, o);
       // needsUpdate после первого аплоада в Chrome не перезаливает канвас
       // надёжно (видели и зависший текст, и «хвосты» старых строк) —

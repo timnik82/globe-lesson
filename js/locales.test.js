@@ -29,15 +29,16 @@ test('у всех локалей одинаковый набор ключей', 
 });
 
 test('наборы плейсхолдеров совпадают между локалями', () => {
-  const [baseName, base] = Object.entries(LOCALES)[0];
-  for (const path of keyPaths(base)) {
-    const baseValue = get(base, path);
-    if (typeof baseValue !== 'string' || !baseValue.includes('{')) continue;
-    const baseSet = placeholders(baseValue).sort();
-    for (const [name, dict] of Object.entries(LOCALES)) {
+  // сравниваем на каждом ключе, даже где база без подстановок — иначе перевод
+  // с лишним {n} там, где в базе его нет, пройдёт незамеченным
+  const names = Object.keys(LOCALES);
+  const baseName = DEFAULT_LOCALE;
+  for (const path of keyPaths(LOCALES[baseName])) {
+    const baseSet = placeholders(get(LOCALES[baseName], path)).sort();
+    for (const name of names) {
       if (name === baseName) continue;
-      const value = get(dict, path);
-      assert.deepEqual(placeholders(value).sort(), baseSet, `${path}: плейсхолдеры расходятся в ${name}`);
+      const set = placeholders(get(LOCALES[name], path)).sort();
+      assert.deepEqual(set, baseSet, `${path}: плейсхолдеры расходятся в ${name}`);
     }
   }
 });
@@ -51,6 +52,11 @@ test('в словарях только известные имена плейс�
       for (const name of placeholders(value)) {
         assert.ok(known.includes(name), `${path}: неожиданный плейсхолдер {${name}}`);
       }
+      // после изъятия корректных {n} не должно оставаться скобок —
+      // иначе в UI попадёт сырой текст вида «{ city}»
+      const broken = value.replace(/\{\w+\}/g, '');
+      assert.ok(!broken.includes('{') && !broken.includes('}'),
+        `${path}: сломанный плейсхолдер в «${value}»`);
     }
   }
 });
